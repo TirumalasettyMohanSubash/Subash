@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Model Performance Matrix</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            background: white;
+            padding: 30px;
+            margin: 20px auto;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        h1 {
+            color: #667eea;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+
+        .accuracy-box {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .accuracy-number {
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .chart-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .chart-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        canvas {
+            max-height: 300px;
+            width: 100% !important;
+        }
+
+        .model-info {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .welcome {
+            text-align: right;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Model Performance Metrics</h1>
+            <div class="nav-buttons">
+                <a href="/home" class="nav-btn">🏠 Home</a>
+                <a href="/members" class="nav-btn">👥 Members</a>
+                <a href="/logout" class="nav-btn">🚪 Logout</a>
+            </div>
+        </div>
+
+        <div class="welcome">
+            Welcome, <strong>{{ current_user }}</strong>!
+        </div>
+
+        <div class="model-info">
+            <strong>🤖 Model Type:</strong> K-Nearest Neighbors (KNN)<br>
+            <strong>📅 Training Date:</strong> {{ training_date }}<br>
+            <strong>🎯 Target:</strong> Heart Disease Prediction (0 = Low Risk, 1 = High Risk)
+        </div>
+
+        <div class="accuracy-box">
+            <div>Overall Accuracy</div>
+            <div class="accuracy-number">{{ "%.1f"|format(accuracy * 100) }}%</div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-number">{{ tn }}</div>
+                <div class="stat-label">True Negatives</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">{{ fp }}</div>
+                <div class="stat-label">False Positives</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">{{ fn }}</div>
+                <div class="stat-label">False Negatives</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">{{ tp }}</div>
+                <div class="stat-label">True Positives</div>
+            </div>
+        </div>
+
+        <div class="chart-grid">
+            <div class="chart-card">
+                <h3>📊 Confusion Matrix</h3>
+                <canvas id="confusionChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>🥧 Correct vs Incorrect</h3>
+                <canvas id="pieChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>📈 Performance Metrics</h3>
+                <canvas id="metricsChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>🎯 Performance Gauge</h3>
+                <canvas id="gaugeChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Confusion Matrix Bar Chart
+        const ctx1 = document.getElementById('confusionChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: ['True Negatives', 'False Positives', 'False Negatives', 'True Positives'],
+                datasets: [{
+                    label: 'Count',
+                    data: [{{ tn }}, {{ fp }}, {{ fn }}, {{ tp }}],
+                    backgroundColor: ['#2ecc71', '#e74c3c', '#e74c3c', '#2ecc71'],
+                    borderColor: ['#27ae60', '#c0392b', '#c0392b', '#27ae60'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Predictions'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Pie Chart for Correct vs Incorrect
+        const correct = {{ tn + tp }};
+        const incorrect = {{ fp + fn }};
+        const ctx2 = document.getElementById('pieChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'pie',
+            data: {
+                labels: ['Correct Predictions', 'Incorrect Predictions'],
+                datasets: [{
+                    data: [correct, incorrect],
+                    backgroundColor: ['#2ecc71', '#e74c3c'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = correct + incorrect;
+                                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                return `${context.label}: ${context.parsed} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Metrics Comparison Chart
+        const ctx3 = document.getElementById('metricsChart').getContext('2d');
+        new Chart(ctx3, {
+            type: 'bar',
+            data: {
+                labels: ['Precision', 'Recall', 'F1-Score'],
+                datasets: [
+                    {
+                        label: 'Low Risk (Class 0)',
+                        data: [{{ precision_0 }}, {{ recall_0 }}, {{ f1_0 }}],
+                        backgroundColor: '#667eea',
+                        borderColor: '#5a67d8',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'High Risk (Class 1)',
+                        data: [{{ precision_1 }}, {{ recall_1 }}, {{ f1_1 }}],
+                        backgroundColor: '#764ba2',
+                        borderColor: '#6c3a9e',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1,
+                        title: {
+                            display: true,
+                            text: 'Score'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Gauge Chart for Accuracy
+        const accuracy = {{ accuracy }};
+        const ctx4 = document.getElementById('gaugeChart').getContext('2d');
+        new Chart(ctx4, {
+            type: 'doughnut',
+            data: {
+                labels: ['Accuracy', 'Remaining'],
+                datasets: [{
+                    data: [accuracy * 100, 100 - (accuracy * 100)],
+                    backgroundColor: ['#2ecc71', '#ecf0f1'],
+                    borderWidth: 0,
+                    cutout: '70%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.parsed.toFixed(1)}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Add text to gauge chart center
+        setTimeout(() => {
+            const canvas = document.getElementById('gaugeChart');
+            const ctx = canvas.getContext('2d');
+            const chart = Chart.getChart('gaugeChart');
+            if (chart) {
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                ctx.save();
+                ctx.font = 'bold 20px "Segoe UI"';
+                ctx.fillStyle = '#333';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(`${(accuracy * 100).toFixed(1)}%`, centerX, centerY);
+                ctx.restore();
+            }
+        }, 100);
+    </script>
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Heart Disease Prediction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 30px;
+            margin: 20px auto;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 24px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-matrix {
+            background: #9b59b6;
+            color: white;
+        }
+
+        .btn-matrix:hover {
+            background: #8e44ad;
+            transform: translateY(-2px);
+        }
+
+        .btn-members {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-members:hover {
+            background: #229954;
+            transform: translateY(-2px);
+        }
+
+        .btn-logout {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-logout:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .welcome {
+            text-align: right;
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .predict-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .result-high {
+            background: #fee;
+            color: #c0392b;
+            border-left: 4px solid #c0392b;
+        }
+
+        .result-low {
+            background: #e8f8f5;
+            color: #27ae60;
+            border-left: 4px solid #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>❤️ Heart Disease Predictor</h1>
+            <div class="button-group">
+                <a href="/matrix" class="btn btn-matrix">📊 Matrix</a>
+                <a href="/members" class="btn btn-members">👥 Members</a>
+                <a href="/logout" class="btn btn-logout">🚪 Logout</a>
+            </div>
+        </div>
+        
+        <div class="welcome">
+            Welcome, <strong>{{ user }}</strong>!
+        </div>
+
+        <form action="/predict" method="POST">
+            <div class="form-group">
+                <label>Age</label>
+                <input type="number" name="age" required>
+            </div>
+
+            <div class="form-group">
+                <label>Sex</label>
+                <select name="sex">
+                    <option value="1">Male</option>
+                    <option value="0">Female</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Chest Pain Type (0-3)</label>
+                <input type="number" name="cp" step="1" required>
+            </div>
+
+            <div class="form-group">
+                <label>Resting Blood Pressure</label>
+                <input type="number" name="trestbps" required>
+            </div>
+
+            <div class="form-group">
+                <label>Cholesterol</label>
+                <input type="number" name="chol" required>
+            </div>
+
+            <div class="form-group">
+                <label>Fasting Blood Sugar (0 or 1)</label>
+                <input type="number" name="fbs" step="1" required>
+            </div>
+
+            <div class="form-group">
+                <label>Rest ECG (0-2)</label>
+                <input type="number" name="restecg" step="1" required>
+            </div>
+
+            <div class="form-group">
+                <label>Maximum Heart Rate</label>
+                <input type="number" name="thalach" required>
+            </div>
+
+            <div class="form-group">
+                <label>Exercise Induced Angina (0 or 1)</label>
+                <input type="number" name="exang" step="1" required>
+            </div>
+
+            <div class="form-group">
+                <label>Oldpeak</label>
+                <input type="text" name="oldpeak" required>
+            </div>
+
+            <div class="form-group">
+                <label>Slope (0-2)</label>
+                <input type="number" name="slope" step="1" required>
+            </div>
+
+            <div class="form-group">
+                <label>Major Vessels (0-4)</label>
+                <input type="number" name="ca" step="1" required>
+            </div>
+
+            <div class="form-group">
+                <label>Thal (0-3)</label>
+                <input type="number" name="thal" step="1" required>
+            </div>
+
+            <button type="submit" class="predict-btn">Predict Now</button>
+        </form>
+
+        {% if prediction_text %}
+            {% if "High Risk" in prediction_text %}
+                <div class="result result-high">
+                    {{ prediction_text }}
+                </div>
+            {% else %}
+                <div class="result result-low">
+                    {{ prediction_text }}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</body>
+</html>
