@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+<h1>Admin Dashboard</h1>
+<a href="/logout">Logout</a>
+<h2>Registered Students</h2>
+<table border="1" cellpadding="10">
+<tr>
+    <th>ID</th>
+    <th>Username</th>
+    <th>Status</th>
+    <th>Action</th>
+</tr>
+{% for user in users %}
+<tr>
+    <td>{{ user.id }}</td>
+    <td>{{ user.username }}</td>
+    <td>{{ user.status }}</td>
+    <td>
+        {% if user.status == 'active' %}
+        <a href="/block/{{ user.id }}">Block</a>
+        {% else %}
+        <a href="/unblock/{{ user.id }}">Unblock</a>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
+</table>
+</body>
+</html>
