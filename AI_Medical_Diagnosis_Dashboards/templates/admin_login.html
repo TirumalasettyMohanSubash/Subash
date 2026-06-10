@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | Fake News Detection</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body{
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .container{
+            width:380px;
+            background: rgba(255,255,255,0.12);
+            border-radius:20px;
+            padding:35px;
+            backdrop-filter: blur(15px);
+            box-shadow:0 8px 32px rgba(0,0,0,0.3);
+            text-align:center;
+            color:white;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn{
+            from{
+                opacity:0;
+                transform:translateY(-20px);
+            }
+            to{
+                opacity:1;
+                transform:translateY(0);
+            }
+        }
+
+        .container h2{
+            margin-bottom:8px;
+            font-size:30px;
+            font-weight:bold;
+        }
+
+        .container p{
+            margin-bottom:25px;
+            font-size:14px;
+            color:#e0e0e0;
+        }
+
+        .input-box{
+            position:relative;
+            margin:18px 0;
+        }
+
+        .input-box i{
+            position:absolute;
+            left:15px;
+            top:14px;
+            color:#555;
+        }
+
+        .input-box input{
+            width:100%;
+            padding:12px 12px 12px 40px;
+            border:none;
+            border-radius:10px;
+            outline:none;
+            font-size:15px;
+        }
+
+        .toggle-password{
+            position:absolute;
+            right:15px;
+            top:14px;
+            cursor:pointer;
+            color:#555;
+        }
+
+        button{
+            width:100%;
+            padding:12px;
+            margin-top:15px;
+            border:none;
+            border-radius:10px;
+            background:#ff4b5c;
+            color:white;
+            font-size:16px;
+            cursor:pointer;
+            transition:0.3s;
+        }
+
+        button:hover{
+            background:#ff1f3d;
+            transform:scale(1.03);
+        }
+
+        .error{
+            color:yellow;
+            margin-bottom:10px;
+            font-size:14px;
+        }
+
+        .footer{
+            margin-top:20px;
+            font-size:12px;
+            color:#ddd;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2><i class="fas fa-user-shield"></i> Admin Login</h2>
+    <p>Fake News Detection System Dashboard</p>
+
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="/admin">
+
+        <div class="input-box">
+            <i class="fas fa-envelope"></i>
+            <input type="email" name="email" placeholder="Enter Admin Email" required>
+        </div>
+
+        <div class="input-box">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" name="password" placeholder="Enter Password" required>
+            <span class="toggle-password" onclick="togglePassword()">
+                <i class="fas fa-eye"></i>
+            </span>
+        </div>
+
+        <button type="submit"><i class="fas fa-sign-in-alt"></i> Login</button>
+    </form>
+
+    <div class="footer">
+        © 2026 Fake News Detection Admin Panel
+    </div>
+</div>
+
+<script>
+function togglePassword(){
+    var pass = document.getElementById("password");
+    if(pass.type === "password"){
+        pass.type = "text";
+    } else {
+        pass.type = "password";
+    }
+}
+</script>
+
+</body>
+</html>

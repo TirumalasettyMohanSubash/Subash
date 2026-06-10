@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Segoe UI',sans-serif;
+        }
+
+        body{
+            background:linear-gradient(135deg,#dbeafe,#f0f9ff,#ecfeff);
+            min-height:100vh;
+            display:flex;
+        }
+
+        .sidebar{
+            width:240px;
+            background:rgba(255,255,255,0.22);
+            backdrop-filter:blur(12px);
+            padding:30px 20px;
+            box-shadow:4px 0 15px rgba(0,0,0,0.1);
+        }
+
+        .sidebar h2{
+            text-align:center;
+            color:#0f172a;
+            margin-bottom:30px;
+            font-size:24px;
+        }
+
+        .menu-btn{
+            display:block;
+            width:100%;
+            margin:15px 0;
+            padding:14px;
+            border-radius:12px;
+            text-decoration:none;
+            color:white;
+            font-weight:bold;
+            text-align:center;
+            transition:0.3s;
+        }
+
+        .users{background:#6f42c1;}
+        .reports{background:#007bff;}
+        .home{background:#28a745;}
+        .logout{background:#dc3545;}
+
+        .menu-btn:hover{
+            transform:translateX(5px);
+            opacity:0.9;
+        }
+
+        .main{
+            flex:1;
+            padding:30px;
+        }
+
+        .title{
+            text-align:center;
+            font-size:32px;
+            color:#0f172a;
+            margin-bottom:30px;
+            font-weight:bold;
+        }
+
+        .cards{
+            display:flex;
+            justify-content:center;
+            gap:25px;
+            margin-bottom:35px;
+            flex-wrap:wrap;
+        }
+
+        .card{
+            width:220px;
+            background:white;
+            padding:25px;
+            border-radius:20px;
+            box-shadow:0 8px 20px rgba(0,0,0,0.12);
+            text-align:center;
+        }
+
+        .card h3{
+            color:#475569;
+            margin-bottom:10px;
+        }
+
+        .card h1{
+            color:#2563eb;
+            font-size:36px;
+        }
+
+        .chart-row{
+            display:flex;
+            gap:25px;
+            margin-top:20px;
+            flex-wrap:wrap;
+            justify-content:center;
+        }
+
+        .chart-box, .activity-box, .status-box{
+            background:white;
+            padding:25px;
+            border-radius:20px;
+            box-shadow:0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .chart-box{
+            width:46%;
+        }
+
+        .activity-box{
+            width:46%;
+            min-height:280px;
+        }
+
+        .status-box{
+            width:94%;
+            margin:25px auto;
+        }
+
+        h3{
+            margin-bottom:15px;
+            color:#0f172a;
+            text-align:center;
+        }
+
+        ul{
+            list-style:none;
+            line-height:2;
+        }
+
+        .online{
+            color:green;
+            font-weight:bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>🛠 Admin Panel</h2>
+
+    <a href="/admin/users" class="menu-btn users">👥 Manage Users</a>
+    <a href="/admin/reports" class="menu-btn reports">📋 View Reports</a>
+    <a href="/admin" class="menu-btn home">🏠 Admin Home</a>
+    <a href="/admin/logout" class="menu-btn logout">🚪 Logout</a>
+</div>
+
+<div class="main">
+
+    <div class="title">Admin Dashboard Overview</div>
+
+    <div class="cards">
+        <div class="card">
+            <h3>Total Users</h3>
+            <h1>{{ total_users }}</h1>
+        </div>
+
+        <div class="card">
+            <h3>Total Reports</h3>
+            <h1>{{ total_reports }}</h1>
+        </div>
+
+        <div class="card">
+            <h3>Today's Reports</h3>
+            <h1>{{ today_reports }}</h1>
+        </div>
+    </div>
+
+    <div class="chart-row">
+        <div class="chart-box">
+            <h3>📊 System Overview</h3>
+            <canvas id="barChart"></canvas>
+        </div>
+
+        <div class="chart-box">
+            <h3>🥧 Disease Analytics</h3>
+            <canvas id="pieChart"></canvas>
+        </div>
+    </div>
+
+    <div class="chart-row">
+        <div class="activity-box">
+            <h3>🕒 Recent User Activity</h3>
+            <ul>
+                {% for r in recent_reports %}
+                <li>{{ r[0] }} → {{ r[1] }} ({{ "%.1f"|format(r[2]) }}%)</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="activity-box">
+            <h3>🖥 System Health Status</h3>
+            <ul>
+                <li>AI Prediction Model : <span class="online">Running</span></li>
+                <li>Database Server : <span class="online">Connected</span></li>
+                <li>Admin Monitoring : <span class="online">Active</span></li>
+                <li>Report Engine : <span class="online">Operational</span></li>
+                <li>User Management : <span class="online">Stable</span></li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<script>
+new Chart(document.getElementById("barChart"), {
+    type: 'bar',
+    data: {
+        labels: ['Users', 'Reports', 'Today'],
+        datasets: [{
+            label: 'Admin Statistics',
+            data: [{{ total_users }}, {{ total_reports }}, {{ today_reports }}],
+            borderWidth: 1
+        }]
+    }
+});
+
+new Chart(document.getElementById("pieChart"), {
+    type: 'pie',
+    data: {
+        labels: {{ disease_labels|tojson }},
+        datasets: [{
+            data: {{ disease_counts|tojson }}
+        }]
+    }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Registration</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6f9;
+            text-align: center;
+        }
+        .container {
+            width: 380px;
+            margin: 80px auto;
+            padding: 25px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        input:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+        button {
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .link {
+            display: block;
+            margin-top: 15px;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>User Registration</h2>
+
+    <!-- Error message -->
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <form method="post">
+        <input type="text" name="name" placeholder="Enter your name" required>
+
+        <input type="email" name="email" placeholder="Enter your email" required>
+
+        <input type="password" name="password" placeholder="Enter your password" required>
+
+        <button type="submit">Register</button>
+    </form>
+
+    <a href="/user_login" class="link">Already have an account? Login</a>
+</div>
+
+</body>
+</html>

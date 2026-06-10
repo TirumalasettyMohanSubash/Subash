@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Manage Users</title>
+    <meta charset="UTF-8">
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Segoe UI',sans-serif;
+        }
+
+        body{
+            background:linear-gradient(135deg,#dbeafe,#eff6ff,#f8fafc);
+            padding:35px;
+        }
+
+        .container{
+            width:92%;
+            margin:auto;
+            background:white;
+            padding:30px;
+            border-radius:20px;
+            box-shadow:0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        h2{
+            text-align:center;
+            margin-bottom:10px;
+            color:#0f172a;
+            font-size:30px;
+        }
+
+        .subtitle{
+            text-align:center;
+            margin-bottom:20px;
+            color:#64748b;
+            font-size:14px;
+        }
+
+        .search-box{
+            text-align:right;
+            margin-bottom:20px;
+        }
+
+        .search-box input{
+            padding:10px;
+            width:280px;
+            border:1px solid #cbd5e1;
+            border-radius:10px;
+            outline:none;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        th{
+            background:linear-gradient(to right,#7c3aed,#6d28d9);
+            color:white;
+            padding:14px;
+        }
+
+        td{
+            text-align:center;
+            padding:13px;
+            border-bottom:1px solid #e5e7eb;
+        }
+
+        tr:hover{
+            background:#f8fafc;
+        }
+
+        .delete-btn,.block-btn,.unblock-btn{
+            padding:8px 12px;
+            color:white;
+            text-decoration:none;
+            border-radius:8px;
+            font-weight:bold;
+            margin:2px;
+            display:inline-block;
+        }
+
+        .delete-btn{background:#dc2626;}
+        .block-btn{background:#ea580c;}
+        .unblock-btn{background:#16a34a;}
+
+        .active{
+            color:green;
+            font-weight:bold;
+        }
+
+        .blocked{
+            color:red;
+            font-weight:bold;
+        }
+
+        .back{
+            display:inline-block;
+            margin-top:25px;
+            padding:12px 22px;
+            background:#16a34a;
+            color:white;
+            text-decoration:none;
+            border-radius:12px;
+            font-weight:bold;
+        }
+
+        .btn-box{
+            text-align:center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>👥 Registered Users Management</h2>
+    <p class="subtitle">Administrator control panel for viewing and managing registered users</p>
+
+    <div class="search-box">
+        <input type="text" id="searchInput" onkeyup="searchUsers()" placeholder="Search by name or email...">
+    </div>
+
+    <table id="userTable">
+        <tr>
+            <th>ID</th>
+            <th>User Name</th>
+            <th>Email Address</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+
+        {% for user in users %}
+        <tr>
+            <td>{{ user[0] }}</td>
+            <td>{{ user[1] }}</td>
+            <td>{{ user[2] }}</td>
+            <td>
+                {% if user[5] == "Active" %}
+                    <span class="active">Active</span>
+                {% else %}
+                    <span class="blocked">Blocked</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if user[5] == "Active" %}
+                    <a href="/admin/block_user/{{ user[0] }}" class="block-btn">Block</a>
+                {% else %}
+                    <a href="/admin/unblock_user/{{ user[0] }}" class="unblock-btn">Unblock</a>
+                {% endif %}
+                <a href="/admin/delete_user/{{ user[0] }}" class="delete-btn">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <div class="btn-box">
+        <a href="/admin/dashboard" class="back">⬅ Back to Dashboard</a>
+    </div>
+</div>
+
+<script>
+function searchUsers(){
+    let input = document.getElementById("searchInput").value.toLowerCase();
+    let table = document.getElementById("userTable");
+    let tr = table.getElementsByTagName("tr");
+
+    for(let i=1;i<tr.length;i++){
+        let td1 = tr[i].getElementsByTagName("td")[1];
+        let td2 = tr[i].getElementsByTagName("td")[2];
+
+        if(td1 || td2){
+            let txt1 = td1.textContent.toLowerCase();
+            let txt2 = td2.textContent.toLowerCase();
+
+            if(txt1.includes(input) || txt2.includes(input)){
+                tr[i].style.display="";
+            }else{
+                tr[i].style.display="none";
+            }
+        }
+    }
+}
+</script>
+
+</body>
+</html>

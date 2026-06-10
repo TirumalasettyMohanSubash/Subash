@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Result</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(to right, #e3f2fd, #f4f6f9);
+            text-align: center;
+        }
+
+        .box {
+            margin-top: 60px;
+            padding: 30px;
+            background: white;
+            width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 15px;
+            box-shadow: 0px 5px 20px rgba(0,0,0,0.2);
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #007BFF;
+            font-size: 22px;
+        }
+
+        /* Progress bar */
+        .confidence-bar {
+            width: 90%;
+            background: #ddd;
+            border-radius: 20px;
+            margin: 10px auto;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 22px;
+            background: linear-gradient(to right, #28a745, #00c853);
+            width: {{ confidence }}%;
+            text-align: right;
+            padding-right: 5px;
+            color: white;
+            font-size: 12px;
+            line-height: 22px;
+        }
+
+        .risk {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .low { color: green; }
+        .medium { color: orange; }
+        .high { color: red; }
+
+        /* Sections */
+        .section {
+            margin-top: 20px;
+            padding: 12px;
+            text-align: left;
+            border-radius: 6px;
+        }
+
+        .precaution {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+        }
+
+        .explanation {
+            background: #e3f2fd;
+            border-left: 5px solid #2196f3;
+        }
+
+        .top3 {
+            background: #f1f8e9;
+            border-left: 5px solid #8bc34a;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 20px;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .btn-home { background: #28a745; }
+        .btn-history { background: #007BFF; }
+        .btn-download { background: #dc3545; }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+
+    <h2>Prediction Result</h2>
+
+    <!-- Disease -->
+    <p><b>Disease:</b></p>
+    <p class="highlight">{{ disease }}</p>
+
+    <!-- Confidence -->
+    <p><b>Confidence:</b></p>
+
+    <div class="confidence-bar">
+        <div class="confidence-fill">{{ confidence }}%</div>
+    </div>
+
+    <!-- Risk -->
+    <p class="risk">
+        Risk Level:
+        {% if confidence < 40 %}
+            <span class="low">Low</span>
+        {% elif confidence < 70 %}
+            <span class="medium">Medium</span>
+        {% else %}
+            <span class="high">High</span>
+        {% endif %}
+    </p>
+
+    <!-- 🔥 NEW: Top 3 Predictions -->
+    <div class="section top3">
+        <b>Top Predictions:</b>
+        <ul>
+        {% for d, c in diseases %}
+            <li>{{ d }} - {{ "%.2f"|format(c) }}%</li>
+        {% endfor %}
+        </ul>
+    </div>
+
+    <!-- 🔥 NEW: Explanation -->
+    <div class="section explanation">
+        <b>Explanation:</b><br>
+        {{ explanation }}
+    </div>
+
+    <!-- Precautions -->
+    <div class="section precaution">
+        <b>Precautions:</b><br>
+        {{ precautions }}
+    </div>
+
+    <br>
+
+    <!-- Buttons -->
+    <a href="/" class="btn btn-home">Check Again</a>
+    <a href="/history" class="btn btn-history">View History</a>
+
+    <a href="/download?disease={{ disease }}&confidence={{ confidence }}&precautions={{ precautions }}"
+       class="btn btn-download">
+       Download Report
+    </a>
+
+</div>
+
+</body>
+</html>
