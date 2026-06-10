@@ -1,0 +1,32 @@
+<html>
+<head>
+    <title>User Dashboard</title>
+</head>
+<body>
+
+    <h1>User Dashboard</h1>
+    
+    <h2>Predict House Price</h2>
+
+    <form method="POST">
+
+        <input type="number" name="area" placeholder="Area" required>
+        <br><br>
+
+        <input type="number" name="bedrooms" placeholder="Bedrooms" required>
+        <br><br>
+
+        <button type="submit">Predict</button>
+
+    </form>
+
+    <br>
+
+    <h2>Predicted Price: {{ result }}</h2>
+
+    <br>
+
+    <a href="/logout">Logout</a>
+
+</body>
+</html>
